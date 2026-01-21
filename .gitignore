@@ -23,4 +23,4 @@ ENV/
 Thumbs.db
 
 # Misc
-TODO.md
+*.md
