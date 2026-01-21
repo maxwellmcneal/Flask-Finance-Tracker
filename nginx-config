@@ -1,0 +1,72 @@
+server {
+    listen 80;
+    server_name 192.168.8.188;
+    
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header X-Content-Type-Options "nosniff" always;
+
+    # Logs
+    access_log /var/log/nginx/flask-finance-tracker-access.log;
+    error_log /var/log/nginx/flask-finance-tracker-error.log;
+
+    location / {
+        proxy_pass http://127.0.0.1:5000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # Timeout settings
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+
+    # Static files (if you add them later)
+    location /static {
+        alias /opt/flask-finance-tracker/static;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # Deny access to sensitive files
+    location ~ /\. {
+        deny all;
+    }
+
+    location ~ /(\.env|\.git) {
+        deny all;
+    }
+}
+
+# Uncomment this block after setting up SSL with Let's Encrypt
+# server {
+#     listen 443 ssl http2;
+#     server_name finance.local;
+#
+#     ssl_certificate /etc/letsencrypt/live/finance.local/fullchain.pem;
+#     ssl_certificate_key /etc/letsencrypt/live/finance.local/privkey.pem;
+#
+#     # SSL configuration
+#     ssl_protocols TLSv1.2 TLSv1.3;
+#     ssl_prefer_server_ciphers on;
+#     ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384;
+#
+#     # Same location blocks as above
+#     location / {
+#         proxy_pass http://127.0.0.1:5000;
+#         proxy_set_header Host $host;
+#         proxy_set_header X-Real-IP $remote_addr;
+#         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+#         proxy_set_header X-Forwarded-Proto $scheme;
+#     }
+# }
+#
+# # Redirect HTTP to HTTPS
+# server {
+#     listen 80;
+#     server_name finance.local;
+#     return 301 https://$server_name$request_uri;
+# }

@@ -1,0 +1,16 @@
+[Unit]
+Description=Flask Finance Tracker
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/flask-finance-tracker
+Environment="PATH=/opt/flask-finance-tracker/venv/bin"
+ExecStart=/opt/flask-finance-tracker/venv/bin/gunicorn --workers 3 --bind 127.0.0.1:5000 "app:create_app()"
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
