@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block expenses_add %}
+<div class="container" style="padding-top: 60px;">
+    <h2>Add an expense</h2>
+    {% from 'bootstrap5/form.html' import render_form %}
+    {{ render_form(form) }}
+</div>
+{% endblock %}

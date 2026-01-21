@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block index %}
+<div class="container" style="padding-top: 60px;">
+    <h2>Welcome to the home page!</h2>
+</div>
+<div class="container">
+    <h4>Total expenses this month: {{ "$%.2f"|format(monthly_total) }}</h4>
+</div>
+{% endblock %}
