@@ -25,4 +25,4 @@ def create_graph():
         yaxis_title='Y Axis'
     )
     graph_html = pio.to_html(fig, include_plotlyjs='cdn', div_id='plot')
-    return render_template("graphs.html", graph_html=graph_html)
+    return render_template("graphs.html", graph_html=graph_html, active_page="graphs")

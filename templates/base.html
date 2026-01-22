@@ -3,36 +3,44 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Expense Tracker</title>
+        <title>Flask Finance Tracker</title>
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
         {{ bootstrap.load_css() }}
     </head>
     <body>
         <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top primary-bg">
-            <a class="navbar-brand" href="/">Expense Tracker</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <!-- http://jinja.pocoo.org/docs/2.10/tricks/#highlighting-active-menu-items -->
-            {% set navigation_bar = [
-                ('/expenses', 'expenses', 'Expenses'),
-                ('/graphs', 'graphs', 'Graphs')
-            ] -%}
-            {% set active_page = active_page|default('expenses') -%}
-            <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-                <ul class="navbar-nav mr-auto">
-                {% for href, id, caption in navigation_bar %}
-                    {% if id == active_page %}
-                    <li class="nav-item active">
-                        <a class="nav-link" href="{{ href|e }}">{{ caption|e }}</a>
-                    </li>
-                    {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ href|e }}">{{ caption|e }}</a>
-                    </li>
-                    {% endif %}
-                {% endfor %}
-                </ul>
+            <div class="container-fluid">
+                {% if active_page == "index" %}
+                <span class="navbar-brand">Flask Finance Tracker</span>
+                {% else %}
+                <a class="navbar-brand" href="/">Flask Finance Tracker</a>
+                {% endif %}
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                {% set navigation_bar = [
+                    ('/expenses', 'expenses', 'Expenses'),
+                    ('/expenses/add', 'expenses_add', 'Add Expense'),
+                    ('/graphs', 'graphs', 'Graphs')
+                ] %}
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav mr-auto">
+                        {% for href, id, caption in navigation_bar %}
+                            {% if id == active_page %}
+                            <li class="nav-item active">
+                                <!--
+                                <a class="nav-link" aria-current="page" href="{{ href }}">{{ caption }}</a>
+                                -->
+                                <span class="nav-link active" aria-current"page">{{ caption }}</span>
+                            </li>
+                            {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ href }}">{{ caption }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
         </nav>
 
