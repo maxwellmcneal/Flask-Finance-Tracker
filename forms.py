@@ -9,13 +9,16 @@ from wtforms import (Form,
 from flask_wtf import FlaskForm
 from wtforms_sqlalchemy.fields import QuerySelectField
 import datetime as dt
+import zoneinfo as zi
+
+DEFAULT_TIMEZONE = zi.ZoneInfo('US/Pacific')
 
 def is_not_in_future(form, field):
     if field.data > dt.date.today():
         raise validators.ValidationError('Date cannot be in the future')
 
 class ExpenseForm(FlaskForm):
-    date = DateField('Date', [validators.DataRequired(), is_not_in_future], default=dt.date.today())
+    date = DateField('Date', [validators.DataRequired(), is_not_in_future], default=dt.datetime.now(DEFAULT_TIMEZONE).date())
     amount = FloatField('Amount', [validators.DataRequired(), validators.NumberRange(min=0.01)])
     retailer = StringField('Retailer', [validators.DataRequired()])
     description = StringField('Description')
