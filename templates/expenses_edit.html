@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
 {% block expenses_edit %}
-<div class="container" style="padding-top: 60px;">
-    <h2>Editing expense (ID = {{expense.id}})</h2>
+<div class="container" style="padding-top: 70px;">
+    <h3>Edit expense (expense_id = {{expense.id}})</h3>
     {% from 'bootstrap5/form.html' import render_form %}
     {{ render_form(form) }}
 </div>
