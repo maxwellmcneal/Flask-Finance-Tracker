@@ -1,4 +1,5 @@
 from flask import Flask, render_template
+from flask_wtf.csrf import CSRFProtect
 from extensions import db, bootstrap
 from views.expenses import expenses_bp
 from views.graphs import graphs_bp
@@ -9,6 +10,8 @@ from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
+# CSRF protection
+csrf = CSRFProtect()
 
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=False)
@@ -19,7 +22,8 @@ def create_app(test_config=None):
     )
     if test_config:
         app.config.update(test_config)
-
+        
+    csrf.init_app(app)
     db.init_app(app)
     bootstrap.init_app(app)
 
@@ -31,23 +35,27 @@ def create_app(test_config=None):
         current_date = dt.date.today()
         # Get first and last day of current month
         first_day = current_date.replace(day=1)
-        if current_date.month == 12:
-            last_day = current_date.replace(day=31)
-        else:
-            last_day = (current_date.replace(month=current_date.month + 1, day=1) - dt.timedelta(days=1))
 
-        # Query all expenses in current month
+        # Query all expenses from start of month to today
         monthly_expenses = db.session.execute(
             db.select(Expense).filter(
                 Expense.date >= first_day,
-                Expense.date <= last_day
+                Expense.date <= current_date
             )
         ).scalars().all()
 
-        # Calculate monthly total
+        # Calculate monthly expense total
         monthly_total = sum(expense.amount for expense in monthly_expenses)
-
-        return render_template("index.html", active_page="index", monthly_total=monthly_total)
+        # Calculate zero spend days
+        expense_dates = {expense.date for expense in monthly_expenses}
+        days_elapsed = current_date.day
+        zero_spend_days = days_elapsed - len(expense_dates)
+        
+        return render_template("index.html", active_page="index",
+                               current_date=current_date,
+                               monthly_total=monthly_total, 
+                               zero_spend_days=zero_spend_days,
+                               days_elapsed=days_elapsed)
 
     with app.app_context():
         db.create_all()

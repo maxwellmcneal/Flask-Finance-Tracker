@@ -1,10 +1,13 @@
 {% extends "base.html" %}
 
 {% block index %}
-<div class="container" style="padding-top: 60px;">
-    <h2>Welcome to the home page!</h2>
+<div class="container" style="padding-top: 70px;">
+    <div class="col alert alert-primary" role="alert">
+        <h5>{{ current_date.strftime("%B") }} Expenses Summary</h5>
+        <hr class="hr" />
+        Total expenses this month: {{ "$%.2f"|format(monthly_total) }}<br>
+        Zero-spend days this month: {{ zero_spend_days }} of {{ days_elapsed }}
+    </div>
 </div>
-<div class="container">
-    <h4>Total expenses this month: {{ "$%.2f"|format(monthly_total) }}</h4>
-</div>
+
 {% endblock %}

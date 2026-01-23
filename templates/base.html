@@ -28,9 +28,6 @@
                         {% for href, id, caption in navigation_bar %}
                             {% if id == active_page %}
                             <li class="nav-item active">
-                                <!--
-                                <a class="nav-link" aria-current="page" href="{{ href }}">{{ caption }}</a>
-                                -->
                                 <span class="nav-link active" aria-current"page">{{ caption }}</span>
                             </li>
                             {% else %}
