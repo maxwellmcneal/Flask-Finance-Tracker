@@ -13,12 +13,15 @@ import zoneinfo as zi
 
 DEFAULT_TIMEZONE = zi.ZoneInfo('US/Pacific')
 
+def get_todays_date():
+    return dt.datetime.now(DEFAULT_TIMEZONE).date()
+
 def is_not_in_future(form, field):
-    if field.data > dt.date.today():
+    if field.data > get_todays_date():
         raise validators.ValidationError('Date cannot be in the future')
 
 class ExpenseForm(FlaskForm):
-    date = DateField('Date', [validators.DataRequired(), is_not_in_future], default=dt.datetime.now(DEFAULT_TIMEZONE).date())
+    date = DateField('Date', [validators.DataRequired(), is_not_in_future], default=get_todays_date())
     amount = FloatField('Amount', [validators.DataRequired(), validators.NumberRange(min=0.01)])
     retailer = StringField('Retailer', [validators.DataRequired()])
     description = StringField('Description')
