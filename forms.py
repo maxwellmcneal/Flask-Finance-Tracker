@@ -21,7 +21,7 @@ def is_not_in_future(form, field):
         raise validators.ValidationError('Date cannot be in the future')
 
 class ExpenseForm(FlaskForm):
-    date = DateField('Date', [validators.DataRequired(), is_not_in_future], default=get_todays_date())
+    date = DateField('Date', [validators.DataRequired(), is_not_in_future], default=get_todays_date)
     amount = FloatField('Amount', [validators.DataRequired(), validators.NumberRange(min=0.01)])
     retailer = StringField('Retailer', [validators.DataRequired()])
     description = StringField('Description')
