@@ -7,6 +7,7 @@ from models import Expense
 import os
 import datetime as dt
 from dotenv import load_dotenv
+from helper import get_todays_date
 
 # Load environment variables from .env file
 load_dotenv()
@@ -32,7 +33,7 @@ def create_app(test_config=None):
 
     @app.route("/")
     def index():
-        current_date = dt.date.today()
+        current_date = get_todays_date()
         # Get first and last day of current month
         first_day = current_date.replace(day=1)
 
