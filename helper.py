@@ -1,7 +1,5 @@
 import datetime as dt
-import zoneinfo as zi
-
-DEFAULT_TIMEZONE = zi.ZoneInfo('US/Pacific')
+from constants import DEFAULT_TIMEZONE
 
 def get_todays_date(timezone = DEFAULT_TIMEZONE):
     return dt.datetime.now(timezone).date()
