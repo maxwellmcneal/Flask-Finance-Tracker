@@ -1,3 +1,7 @@
+from dotenv import load_dotenv
+# Load environment variables from .env file
+load_dotenv()
+
 from flask import Flask, render_template
 from flask_wtf.csrf import CSRFProtect
 from extensions import db, bootstrap
@@ -6,11 +10,9 @@ from views.graphs import graphs_bp
 from models import Expense
 import os
 import datetime as dt
-from dotenv import load_dotenv
+
 from helper import get_todays_date
 
-# Load environment variables from .env file
-load_dotenv()
 # CSRF protection
 csrf = CSRFProtect()
 
