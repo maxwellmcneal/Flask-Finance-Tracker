@@ -49,27 +49,6 @@
                         <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal-{{ expense.id }}">
                             Delete
                         </button>
-
-                        <div class="modal fade" id="deleteModal-{{ expense.id }}" tabindex="-1" aria-labelledby="deleteModalLabel-{{ expense.id }}" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="deleteModalLabel-{{ expense.id }}">Delete expense?</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        Are you sure you want to delete this expense?
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                        <form method="POST" action="/expenses/delete/{{ expense.id }}" style="display: inline;">
-                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                            <button type="submit" class="btn btn-secondary btn-danger">Delete</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </td>
                 </tr>
                 {% endfor %}
@@ -81,6 +60,28 @@
             </tbody>
         </table>
     </div>
+    {% for expense in expenses %}
+    <div class="modal fade" id="deleteModal-{{ expense.id }}" tabindex="-1" aria-labelledby="deleteModalLabel-{{ expense.id }}" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel-{{ expense.id }}">Delete expense?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this expense?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form method="POST" action="/expenses/delete/{{ expense.id }}" style="display: inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
     {% from 'bootstrap5/pagination.html' import render_pagination %}
     {{ render_pagination(pagination) }}
 </div>
