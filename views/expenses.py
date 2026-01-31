@@ -8,20 +8,6 @@ expenses_bp = Blueprint("expenses", __name__, url_prefix="/expenses")
 
 @expenses_bp.route("/", methods=["GET"])
 def list_expenses():
-    # optionally add one test expense if none exist
-    # if not Expense.query.first():
-    #     test_expense = Expense(
-    #         id=123,
-    #         date=dt.date(2025, 6, 1),
-    #         amount=5.99,
-    #         retailer="Spotify",
-    #         description="June subscription",
-    #         category="Entertainment",
-    #         payment_method="Chase Credit Card (8458)"
-    #     )
-    #     db.session.add(test_expense)
-    #     db.session.commit()
-
     page = request.args.get("page", 1, type=int)
     
     pagination = db.paginate(db.select(Expense).order_by(Expense.id.desc()), page=page, per_page=10, error_out=False)
@@ -62,7 +48,7 @@ def edit_expense(expense_id: int):
         db.session.commit()
         flash("Expense successfully edited!")
         return redirect(url_for("expenses.list_expenses"))
-    return render_template("expenses_edit.html", form=form, expense=expense)
+    return render_template("expenses_edit.html", form=form, expense=expense, active_page="expenses_edit")
 
 
 @expenses_bp.route("/delete/<int:expense_id>", methods=["POST"])
