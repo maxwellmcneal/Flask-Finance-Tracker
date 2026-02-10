@@ -16,7 +16,38 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     {% endfor %}
-    <div class="table-responsive">
+    <br>
+    <!-- MOBILE VIEW -->
+    <div class="d-block d-md-none">
+        {% for expense in expenses %}
+            <div class="card mb-2 expense-card" data-expense-id="{{ expense.id }}" role="button" tabindex="0">
+                <div class="card-body py-2 px-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="expense-main-info">
+                            <h5 class="card-title mb-1 text-truncate" style="max-width: 200px;">
+                                {{ expense.retailer }}
+                            </h5>
+                            <small class="text-muted">
+                                {{ expense.date.strftime("%m/%d/%Y") }}
+                            </small>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-center">
+                            <div class="expense-amount text-end me-3">
+                                <h5 class="fw-bold text-primary">
+                                    {{ "$%.2f"|format(expense.amount) }}
+                                </h5>
+                                <span class="badge rounded-pill bg-secondary">{{ expense.category.name }}</span>
+                            </div>
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- DESKTOP VIEW -->
+    <div class="table-responsive d-none d-md-block">
         <table class="table">
             <thead class="thead-light">
                 <tr>
@@ -39,8 +70,8 @@
                     <td>{{ "$%.2f"|format(expense.amount) }}</td>
                     <td>{{ expense.retailer }}</td>
                     <td>{{ expense.description }}</td>
-                    <td>{{ expense.category }}</td>
-                    <td>{{ expense.payment_method }}</td>
+                    <td>{{ expense.category.name }}</td>
+                    <td>{{ expense.payment_method.name }}</td>
                     <td>
                         <a class="btn btn-sm btn-primary" href="/expenses/edit/{{ expense.id }}" role="button">
                             Edit
@@ -83,7 +114,9 @@
     </div>
     {% endfor %}
     {% from 'bootstrap5/pagination.html' import render_pagination %}
-    {{ render_pagination(pagination) }}
+    <div class="d-flex justify-content-end">
+        {{ render_pagination(pagination) }}
+    </div>
 </div>
-
+<br>
 {% endblock %}
