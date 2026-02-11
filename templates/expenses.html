@@ -1,5 +1,21 @@
 {% extends "base.html" %}
 
+{% block styles %}
+<style>
+	.chevron-toggle { 
+		transition: opacity 0.2s, max-width 0.2s, margin 0.2s;           
+		max-width: 2em;
+		overflow: hidden;
+		opacity: 1;
+	}
+	.chevron-toggle.hidden {
+		opacity: 0;
+		max-width: 0;
+		margin-left: 0 !important;
+	}
+</style>
+{% endblock %}
+
 {% block expenses %}
 <div class="container" style="padding-top: 70px;">
     <div class="row">
@@ -10,35 +26,57 @@
             </a>
         </div>
     </div>
+    <br>
     {% for message in get_flashed_messages() %}
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         <strong>{{ message }}</strong>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     {% endfor %}
-    <br>
     <!-- MOBILE VIEW -->
     <div class="d-block d-md-none">
         {% for expense in expenses %}
-            <div class="card mb-2 expense-card" data-expense-id="{{ expense.id }}" role="button" tabindex="0">
+           <div class="card mb-2 expense-card" data-expense-id="{{ expense.id }}">
                 <div class="card-body py-2 px-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="expense-main-info">
-                            <h5 class="card-title mb-1 text-truncate" style="max-width: 200px;">
+                    <div class="d-flex flex-column justify-content-between">
+                        <div class="d-flex justify-content-between expense-main-info">
+                            <span class="fw-medium fs-5">
                                 {{ expense.retailer }}
-                            </h5>
+                            </span>
+                            <span class="text-primary fw-semibold fs-5">
+                                {{ "$%.2f"|format(expense.amount) }}
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between">
                             <small class="text-muted">
                                 {{ expense.date.strftime("%m/%d/%Y") }}
                             </small>
-                        </div>
-                        <div class="d-flex justify-content-end align-items-center">
-                            <div class="expense-amount text-end me-3">
-                                <h5 class="fw-bold text-primary">
-                                    {{ "$%.2f"|format(expense.amount) }}
-                                </h5>
-                                <span class="badge rounded-pill bg-secondary">{{ expense.category.name }}</span>
+                            <div class="d-flex">
+                                <div class="text-end">
+                                    <span class="badge rounded-pill bg-secondary fw-medium">
+                                        {{ expense.category.name }}
+                                    </span>
+                                </div>
+                                <i class="bi bi-chevron-down text-muted ms-2 chevron-toggle" role="button" data-bs-toggle="collapse" data-bs-target="#expandCard{{ expense.id }}"></i>
                             </div>
-                            <i class="bi bi-chevron-right text-muted"></i>
+                        </div>
+                        <div class="collapse mt-2" id="expandCard{{ expense.id }}">
+                            <div class="d-flex justify-content-between">
+                                <div > <!-- try adding background for description -->
+                                    <span fs-6>
+                                        {{ expense.description }}
+                                    </span>
+                                </div>
+                                <div class="d-flex justify-content-end align-self-end align-items-center">
+                                    <div class="d-flex align-items-end">
+                                        <a class="btn btn-primary btn-sm me-2" href="/expenses/edit/{{ expense.id }}" role="button">Edit</a>
+                                        <button type="button" class="btn btn-danger btn-sm me-2" data-bs-toggle="modal" data-bs-target="#deleteModal-{{ expense.id }}">Delete</button>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-chevron-up text-muted" role="button" data-bs-toggle="collapse" data-bs-target="#expandCard{{ expense.id }}"></i>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -119,4 +157,21 @@
     </div>
 </div>
 <br>
+{% endblock %}
+
+{% block scripts %}
+<script>
+	document.querySelectorAll('.expense-card .collapse').forEach(collapseEl => {
+		const card = collapseEl.closest('.expense-card');
+		const downArrow = card.querySelector('.bi-chevron-down');
+	
+		collapseEl.addEventListener('show.bs.collapse', () => {
+			downArrow.classList.add('hidden');
+		});
+	
+		collapseEl.addEventListener('hidden.bs.collapse', () => {
+			downArrow.classList.remove('hidden');
+		});
+	});
+</script>
 {% endblock %}
