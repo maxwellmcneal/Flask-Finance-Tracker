@@ -2,7 +2,7 @@
 
 {% block styles %}
 <style>
-	.chevron-toggle { 
+    .chevron-toggle { 
 		transition: opacity 0.2s, max-width 0.2s, margin 0.2s;           
 		max-width: 2em;
 		overflow: hidden;
@@ -60,8 +60,8 @@
                                 <i class="bi bi-chevron-down text-muted ms-2 chevron-toggle" role="button" data-bs-toggle="collapse" data-bs-target="#expandCard{{ expense.id }}"></i>
                             </div>
                         </div>
-                        <div class="collapse mt-2" id="expandCard{{ expense.id }}">
-                            <div class="d-flex justify-content-between">
+                        <div class="collapse" id="expandCard{{ expense.id }}">
+                            <div class="d-flex justify-content-between pt-2">
                                 <div > <!-- try adding background for description -->
                                     <span fs-6>
                                         {{ expense.description }}
