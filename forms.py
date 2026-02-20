@@ -19,7 +19,7 @@ def future_validator(form, field):
 
 class ExpenseForm(FlaskForm):
     date = DateField('Date', [validators.DataRequired(), future_validator], default=get_todays_date)
-    amount = DecimalField('Amount', [validators.DataRequired(), validators.NumberRange(min=0.01)])
+    amount = DecimalField('Amount', [validators.DataRequired(), validators.NumberRange(min=0.01)], render_kw={'inputmode':'decimal'})
     retailer = StringField('Retailer', [validators.DataRequired()])
     description = StringField('Description')
     # category = SelectField('Category', [validators.DataRequired()], choices=EXPENSE_CATEGORIES)
