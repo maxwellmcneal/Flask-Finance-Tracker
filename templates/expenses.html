@@ -95,7 +95,7 @@
                     <th scope="col">Retailer</th>
                     <th scope="col">Description</th>
                     <th scope="col">Category</th>
-                    <th scope="col">Payment Method</th>
+                    <th scope="col">Account</th>
                     <th scope="col">Actions</th>
                 </tr>
             </thead>
@@ -109,7 +109,7 @@
                     <td>{{ expense.retailer }}</td>
                     <td>{{ expense.description }}</td>
                     <td>{{ expense.category.name }}</td>
-                    <td>{{ expense.payment_method.name }}</td>
+                    <td>{{ expense.account.name }}</td>
                     <td>
                         <a class="btn btn-sm btn-primary" href="/expenses/edit/{{ expense.id }}" role="button">
                             Edit

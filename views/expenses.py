@@ -25,7 +25,7 @@ def add_expense():
             retailer=form.retailer.data,
             description=form.description.data,
             category=form.category.data,
-            payment_method=form.payment_method.data,
+            account=form.account.data,
         )
         db.session.add(expense)
         db.session.commit()
@@ -44,7 +44,7 @@ def edit_expense(expense_id: int):
         expense.retailer = form.retailer.data
         expense.description = form.description.data
         expense.category = form.category.data
-        expense.payment_method = form.payment_method.data
+        expense.account = form.account.data
         db.session.commit()
         flash("Expense successfully edited!")
         return redirect(url_for("expenses.list_expenses"))
