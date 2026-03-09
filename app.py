@@ -6,8 +6,9 @@ from flask import Flask, render_template
 from flask_wtf.csrf import CSRFProtect
 from extensions import db, bootstrap
 from views.expenses import expenses_bp
+from views.income import income_bp
 from views.graphs import graphs_bp
-from models import Expense
+from models import Expense, Income
 import os
 import datetime as dt
 
@@ -34,6 +35,7 @@ def create_app(test_config=None):
     bootstrap.init_app(app)
 
     app.register_blueprint(expenses_bp)
+    app.register_blueprint(income_bp)
     app.register_blueprint(graphs_bp)
 
     @app.route("/")
@@ -49,9 +51,19 @@ def create_app(test_config=None):
                 Expense.date <= current_date
             )
         ).scalars().all()
+        
+        # Query all expenses from start of month to today
+        monthly_income = db.session.execute(
+            db.select(Income).filter(
+                Income.date >= first_day,
+                Income.date <= current_date
+            )
+        ).scalars().all()
 
         # Calculate monthly expense total
-        monthly_total = sum(expense.amount for expense in monthly_expenses)
+        monthly_expenses_total = sum(expense.amount for expense in monthly_expenses)
+        monthly_income_total = sum(income.amount for income in monthly_income)
+        
         # Calculate zero spend days
         expense_dates = {expense.date for expense in monthly_expenses}
         days_elapsed = current_date.day
@@ -59,7 +71,8 @@ def create_app(test_config=None):
         
         return render_template("index.html", active_page="index",
                                current_date=current_date,
-                               monthly_total=monthly_total, 
+                               monthly_expenses_total=monthly_expenses_total,
+                               monthly_income_total=monthly_income_total, 
                                zero_spend_days=zero_spend_days,
                                days_elapsed=days_elapsed)
 

@@ -26,6 +26,7 @@ class ExpenseCategory(db.Model):
 
 class Expense(db.Model):
     __tablename__ = "expenses"
+    
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     date: Mapped[dt.date] = mapped_column(Date)
     amount: Mapped[float] = mapped_column(Float)
@@ -37,4 +38,26 @@ class Expense(db.Model):
 
     # Relationships
     category: Mapped["ExpenseCategory"] = relationship()
+    account: Mapped["Account"] = relationship()
+    
+class IncomeCategory(db.Model):
+    __tablename__ = "income_categories"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(255))
+    
+class Income(db.Model):
+    __tablename__ = "income"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    date: Mapped[dt.date] = mapped_column(Date)
+    amount: Mapped[float] = mapped_column(Float)
+    source: Mapped[str] = mapped_column(String(255))
+    description: Mapped[str] = mapped_column(String(255), nullable=True)
+    category_id: Mapped[int] = mapped_column(ForeignKey("income_categories.id"))
+    account_id: Mapped[int] = mapped_column(ForeignKey("accounts.id"))
+    reconciled: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    # Relationships
+    category: Mapped["IncomeCategory"] = relationship()
     account: Mapped["Account"] = relationship()

@@ -5,7 +5,8 @@
     <div class="col alert alert-primary" role="alert">
         <h5>{{ current_date.strftime("%B") }} Expenses Summary</h5>
         <hr class="hr" />
-        Total expenses this month: {{ "$%.2f"|format(monthly_total) }}<br>
+        Total expenses this month: {{ "$%.2f"|format(monthly_expenses_total) }}<br>
+        Total income this month: {{ "$%.2f"|format(monthly_income_total) }}<br>
         Zero-spend days this month: {{ zero_spend_days }} of {{ days_elapsed }}
     </div>
 </div>

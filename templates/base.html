@@ -21,6 +21,10 @@
                         {'href':'/expenses', 'id':'expenses', 'caption':'Expense List'},
                         {'href':'/expenses/add', 'id':'expenses_add', 'caption':'Add Expense'}
                     ]},
+                    {'caption':'Income', 'id_prefix':'income', 'dropdown':[
+                       {'href':'/income', 'id':'income', 'caption':'Income List'},
+                       {'href':'/income/add', 'id':'income_add', 'caption':'Add Income'} 
+                    ]},
                     {'href':'/graphs', 'id':'graphs', 'caption':'Graphs'}    
                 ] %}
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -52,6 +56,10 @@
         {% block expenses %}{% endblock %}
         {% block expenses_add %}{% endblock %}
         {% block expenses_edit %}{% endblock %}
+        {% block income %}{% endblock %}
+        {% block income_add %}{% endblock %}
+        {% block income_edit %}{% endblock %}
+        
         {% block graphs %}{% endblock %}
         
         {% block scripts %}{% endblock %}
