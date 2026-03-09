@@ -2,8 +2,12 @@
 
 {% block expenses_add %}
 <div class="container" style="padding-top: 70px;">
-    <h3>Add new expense</h3>
-    {% from 'bootstrap5/form.html' import render_form %}
-    {{ render_form(form) }}
+    <div class="card mb-2">
+        <div class="card-body py-2 px-3">
+            <h3>Add new expense</h3>
+            {% from 'bootstrap5/form.html' import render_form %}
+            {{ render_form(form) }}
+        </div>
+    </div>
 </div>
 {% endblock %}
