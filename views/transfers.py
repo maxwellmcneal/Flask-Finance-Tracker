@@ -11,7 +11,7 @@ transfers_bp = Blueprint("transfers", __name__, url_prefix="/transfers")
 def list_transfers():
     page = request.args.get("page", 1, type=int)
 
-    pagination = db.paginate(db.select(Transfer).order_by(Transfer.id.desc()), page=page, per_page=10, error_out=False)
+    pagination = db.paginate(db.select(Transfer).order_by(Transfer.date.desc(), Transfer.id.desc()), page=page, per_page=10, error_out=False)
     transfers = pagination.items
     return render_template("transfers.html", pagination=pagination, transfers=transfers, active_page="transfers")
 

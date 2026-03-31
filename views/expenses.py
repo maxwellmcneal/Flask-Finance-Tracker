@@ -10,7 +10,7 @@ expenses_bp = Blueprint("expenses", __name__, url_prefix="/expenses")
 def list_expenses():
     page = request.args.get("page", 1, type=int)
     
-    pagination = db.paginate(db.select(Expense).order_by(Expense.id.desc()), page=page, per_page=10, error_out=False)
+    pagination = db.paginate(db.select(Expense).order_by(Expense.date.desc(), Expense.id.desc()), page=page, per_page=10, error_out=False)
     expenses = pagination.items
     return render_template("expenses.html", pagination=pagination, expenses=expenses, Expense=Expense, active_page="expenses")
 

@@ -11,7 +11,7 @@ income_bp = Blueprint("income", __name__, url_prefix="/income")
 def list_income():
     page = request.args.get("page", 1, type=int)
 
-    pagination = db.paginate(db.select(Income).order_by(Income.id.desc()), page=page, per_page=10, error_out=False)
+    pagination = db.paginate(db.select(Income).order_by(Income.date.desc(), Income.id.desc()), page=page, per_page=10, error_out=False)
     income = pagination.items
     return render_template("income.html", pagination=pagination, income=income, Income=Income, active_page="income")
 
