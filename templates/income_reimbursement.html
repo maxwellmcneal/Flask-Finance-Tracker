@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block income_reimbursement %}
+<div class="container" style="padding-top: 70px;">
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>{{ message }}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+
+    <div class="card mb-3">
+        <div class="card-body py-2 px-3">
+            <h5 class="card-title">Income Summary</h5>
+            <div class="row">
+                <div class="col-sm-6">
+                    <p class="mb-1"><strong>Date:</strong> {{ income.date.strftime("%m/%d/%Y") }}</p>
+                    <p class="mb-1"><strong>Source:</strong> {{ income.source }}</p>
+                </div>
+                <div class="col-sm-6">
+                    <p class="mb-1"><strong>Amount:</strong> {{ "$%.2f"|format(income.amount) }}</p>
+                    <p class="mb-1"><strong>Category:</strong> {{ income.category.name }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h5>Linked Reimbursement</h5>
+    {% if income.reimbursements|length > 0 %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Expense</th>
+                    <th>Amount</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reimb in income.reimbursements %}
+                <tr>
+                    <td>{{ reimb.expense.date.strftime("%m/%d/%Y") }} - {{ reimb.expense.retailer }} ({{ "$%.2f"|format(reimb.expense.amount) }})</td>
+                    <td>{{ "$%.2f"|format(reimb.amount) }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('income.delete_reimbursement', income_id=income.id, reimb_id=reimb.id) }}" style="display: inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-muted">No expense linked yet.</p>
+    {% endif %}
+
+    {% if income.reimbursements|length == 0 %}
+    <div class="card mb-3">
+        <div class="card-body py-2 px-3">
+            <h5 class="card-title">Link to Expense</h5>
+            {% from 'bootstrap5/form.html' import render_form %}
+            {{ render_form(form) }}
+        </div>
+    </div>
+    {% endif %}
+
+    <a href="{{ url_for('income.list_income') }}" class="btn btn-secondary">Back to Income List</a>
+</div>
+<br>
+{% endblock %}

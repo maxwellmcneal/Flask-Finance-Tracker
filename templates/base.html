@@ -25,7 +25,11 @@
                        {'href':'/income', 'id':'income', 'caption':'Income List'},
                        {'href':'/income/add', 'id':'income_add', 'caption':'Add Income'} 
                     ]},
-                    {'href':'/graphs', 'id':'graphs', 'caption':'Graphs'}    
+                    {'caption':'Transfers', 'id_prefix':'transfers', 'dropdown':[
+                       {'href':'/transfers', 'id':'transfers', 'caption':'Transfer List'},
+                       {'href':'/transfers/add', 'id':'transfers_add', 'caption':'Add Transfer'}
+                    ]},
+                    {'href':'/graphs', 'id':'graphs', 'caption':'Graphs'}
                 ] %}
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav mr-auto">
@@ -59,7 +63,12 @@
         {% block income %}{% endblock %}
         {% block income_add %}{% endblock %}
         {% block income_edit %}{% endblock %}
-        
+        {% block income_allocations %}{% endblock %}
+        {% block income_reimbursement %}{% endblock %}
+        {% block transfers %}{% endblock %}
+        {% block transfers_add %}{% endblock %}
+        {% block transfers_edit %}{% endblock %}
+
         {% block graphs %}{% endblock %}
         
         {% block scripts %}{% endblock %}

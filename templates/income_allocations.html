@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block income_allocations %}
+<div class="container" style="padding-top: 70px;">
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>{{ message }}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+
+    <div class="card mb-3">
+        <div class="card-body py-2 px-3">
+            <h5 class="card-title">Income Summary</h5>
+            <div class="row">
+                <div class="col-sm-6">
+                    <p class="mb-1"><strong>Date:</strong> {{ income.date.strftime("%m/%d/%Y") }}</p>
+                    <p class="mb-1"><strong>Source:</strong> {{ income.source }}</p>
+                </div>
+                <div class="col-sm-6">
+                    <p class="mb-1"><strong>Amount:</strong> {{ "$%.2f"|format(income.amount) }}</p>
+                    <p class="mb-1"><strong>Allocated:</strong> {{ "$%.2f"|format(allocated_total) }}</p>
+                    <p class="mb-1"><strong>Remaining:</strong> {{ "$%.2f"|format(remaining) }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h5>Allocations</h5>
+    {% if income.allocations|length > 0 %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Account</th>
+                    <th>Amount</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for alloc in income.allocations %}
+                <tr>
+                    <td>{{ alloc.account.name }}</td>
+                    <td>{{ "$%.2f"|format(alloc.amount) }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('income.delete_allocation', income_id=income.id, alloc_id=alloc.id) }}" style="display: inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-muted">No allocations yet.</p>
+    {% endif %}
+
+    {% if remaining > 0.01 %}
+    <div class="card mb-3">
+        <div class="card-body py-2 px-3">
+            <h5 class="card-title">Add Allocation</h5>
+            {% from 'bootstrap5/form.html' import render_form %}
+            {{ render_form(form) }}
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">This income is fully allocated.</div>
+    {% endif %}
+
+    <a href="{{ url_for('income.list_income') }}" class="btn btn-secondary">Back to Income List</a>
+</div>
+<br>
+{% endblock %}

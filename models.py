@@ -1,5 +1,5 @@
 import datetime as dt
-from typing import Optional
+from typing import Optional, List
 from sqlalchemy import Integer, Float, Boolean, String, Date, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from extensions import db
@@ -39,7 +39,12 @@ class Expense(db.Model):
     # Relationships
     category: Mapped["ExpenseCategory"] = relationship()
     account: Mapped["Account"] = relationship()
-    
+    reimbursements: Mapped[List["Reimbursement"]] = relationship(back_populates="expense", cascade="all, delete")
+
+    @property
+    def net_amount(self):
+        return self.amount - sum(r.amount for r in self.reimbursements)
+
 class IncomeCategory(db.Model):
     __tablename__ = "income_categories"
     
@@ -61,3 +66,48 @@ class Income(db.Model):
     # Relationships
     category: Mapped["IncomeCategory"] = relationship()
     account: Mapped["Account"] = relationship()
+    allocations: Mapped[List["IncomeAllocation"]] = relationship(back_populates="income", cascade="all, delete-orphan")
+    reimbursements: Mapped[List["Reimbursement"]] = relationship(back_populates="income", cascade="all, delete-orphan")
+
+
+class IncomeAllocation(db.Model):
+    __tablename__ = "income_allocations"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    income_id: Mapped[int] = mapped_column(ForeignKey("income.id"))
+    account_id: Mapped[int] = mapped_column(ForeignKey("accounts.id"))
+    amount: Mapped[float] = mapped_column(Float)
+
+    # Relationships
+    income: Mapped["Income"] = relationship(back_populates="allocations")
+    account: Mapped["Account"] = relationship()
+
+
+class Transfer(db.Model):
+    __tablename__ = "transfers"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    date: Mapped[dt.date] = mapped_column(Date)
+    amount: Mapped[float] = mapped_column(Float)
+    from_account_id: Mapped[int] = mapped_column(ForeignKey("accounts.id"))
+    to_account_id: Mapped[int] = mapped_column(ForeignKey("accounts.id"))
+    description: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    reconciled: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    # Relationships
+    from_account: Mapped["Account"] = relationship(foreign_keys=[from_account_id])
+    to_account: Mapped["Account"] = relationship(foreign_keys=[to_account_id])
+
+
+class Reimbursement(db.Model):
+    __tablename__ = "reimbursements"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    income_id: Mapped[int] = mapped_column(ForeignKey("income.id"))
+    expense_id: Mapped[int] = mapped_column(ForeignKey("expenses.id"))
+    amount: Mapped[float] = mapped_column(Float)
+    date: Mapped[dt.date] = mapped_column(Date)
+
+    # Relationships
+    income: Mapped["Income"] = relationship(back_populates="reimbursements")
+    expense: Mapped["Expense"] = relationship(back_populates="reimbursements")

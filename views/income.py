@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, url_for, redirect, flash, request
 from extensions import db
-from models import Income
-from forms import IncomeForm
+from models import Income, IncomeAllocation, Expense, Reimbursement
+from forms import IncomeForm, IncomeAllocationForm, ReimbursementForm
 import datetime as dt
 
 income_bp = Blueprint("income", __name__, url_prefix="/income")
@@ -31,6 +31,8 @@ def add_income():
         db.session.add(income)
         db.session.commit()
         flash("Income successfully added!")
+        if income.category.name == "Reimbursement":
+            return redirect(url_for("income.manage_reimbursement", income_id=income.id))
         return redirect(url_for("income.list_income"))
     return render_template("income_add.html", form=form, active_page="income_add")
 
@@ -59,3 +61,100 @@ def delete_income(income_id):
     db.session.commit()
     flash("Income successfully deleted!")
     return redirect(url_for("income.list_income"))
+
+
+@income_bp.route("/<int:income_id>/allocations", methods=["GET", "POST"])
+def manage_allocations(income_id):
+    income = db.get_or_404(Income, income_id)
+    form = IncomeAllocationForm()
+
+    allocated_total = sum(a.amount for a in income.allocations)
+    remaining = float(income.amount) - allocated_total
+
+    if form.validate_on_submit():
+        alloc_amount = float(form.amount.data)
+        if alloc_amount > remaining + 0.01:
+            flash("Allocation amount exceeds remaining unallocated amount.")
+        else:
+            allocation = IncomeAllocation(
+                income_id=income.id,
+                account=form.account.data,
+                amount=alloc_amount,
+            )
+            db.session.add(allocation)
+            db.session.commit()
+            flash("Allocation added!")
+            return redirect(url_for("income.manage_allocations", income_id=income.id))
+
+    return render_template(
+        "income_allocations.html",
+        income=income,
+        form=form,
+        allocated_total=allocated_total,
+        remaining=remaining,
+        active_page="income",
+    )
+
+
+@income_bp.route("/<int:income_id>/allocations/<int:alloc_id>/delete", methods=["POST"])
+def delete_allocation(income_id, alloc_id):
+    allocation = db.get_or_404(IncomeAllocation, alloc_id)
+    if allocation.income_id != income_id:
+        flash("Invalid allocation.")
+        return redirect(url_for("income.manage_allocations", income_id=income_id))
+    db.session.delete(allocation)
+    db.session.commit()
+    flash("Allocation deleted!")
+    return redirect(url_for("income.manage_allocations", income_id=income_id))
+
+
+@income_bp.route("/<int:income_id>/reimbursement", methods=["GET", "POST"])
+def manage_reimbursement(income_id):
+    income = db.get_or_404(Income, income_id)
+
+    # Get expenses with unreimbursed balance
+    all_expenses = db.session.execute(
+        db.select(Expense).order_by(Expense.date.desc())
+    ).scalars().all()
+    eligible_expenses = [e for e in all_expenses if e.net_amount > 0.01]
+
+    form = ReimbursementForm()
+    form.expense.query_factory = lambda: eligible_expenses
+
+    if form.validate_on_submit():
+        reimb_amount = float(form.amount.data)
+        expense = form.expense.data
+        if reimb_amount > float(income.amount) + 0.01:
+            flash("Amount exceeds the income amount.")
+        elif reimb_amount > expense.net_amount + 0.01:
+            flash("Amount exceeds expense's unreimbursed balance.")
+        else:
+            reimbursement = Reimbursement(
+                income_id=income.id,
+                expense=expense,
+                amount=reimb_amount,
+                date=income.date,
+            )
+            db.session.add(reimbursement)
+            db.session.commit()
+            flash("Reimbursement linked!")
+            return redirect(url_for("income.manage_reimbursement", income_id=income.id))
+
+    return render_template(
+        "income_reimbursement.html",
+        income=income,
+        form=form,
+        active_page="income",
+    )
+
+
+@income_bp.route("/<int:income_id>/reimbursement/<int:reimb_id>/delete", methods=["POST"])
+def delete_reimbursement(income_id, reimb_id):
+    reimbursement = db.get_or_404(Reimbursement, reimb_id)
+    if reimbursement.income_id != income_id:
+        flash("Invalid reimbursement.")
+        return redirect(url_for("income.manage_reimbursement", income_id=income_id))
+    db.session.delete(reimbursement)
+    db.session.commit()
+    flash("Reimbursement removed!")
+    return redirect(url_for("income.manage_reimbursement", income_id=income_id))

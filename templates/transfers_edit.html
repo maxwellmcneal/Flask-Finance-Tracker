@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block transfers_edit %}
+<div class="container" style="padding-top: 70px;">
+    <div class="card mb-2">
+        <div class="card-body py-2 px-3">
+            <h3>Edit transfer (transfer_id = {{transfer.id}})</h3>
+            {% from 'bootstrap5/form.html' import render_form %}
+            {{ render_form(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

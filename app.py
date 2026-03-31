@@ -7,6 +7,7 @@ from flask_wtf.csrf import CSRFProtect
 from extensions import db, bootstrap
 from views.expenses import expenses_bp
 from views.income import income_bp
+from views.transfers import transfers_bp
 from views.graphs import graphs_bp
 from models import Expense, Income
 import os
@@ -36,6 +37,7 @@ def create_app(test_config=None):
 
     app.register_blueprint(expenses_bp)
     app.register_blueprint(income_bp)
+    app.register_blueprint(transfers_bp)
     app.register_blueprint(graphs_bp)
 
     @app.route("/")
@@ -61,7 +63,7 @@ def create_app(test_config=None):
         ).scalars().all()
 
         # Calculate monthly expense total
-        monthly_expenses_total = sum(expense.amount for expense in monthly_expenses)
+        monthly_expenses_total = sum(expense.net_amount for expense in monthly_expenses)
         monthly_income_total = sum(income.amount for income in monthly_income)
         
         # Calculate zero spend days
