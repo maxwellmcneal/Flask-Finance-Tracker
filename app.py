@@ -127,7 +127,8 @@ def create_app(test_config=None):
                 (Account.type == "Credit Card") |
                 (Account.type == "Checking") |
                 (Account.type == "Savings") |
-                (Account.type == "Cash"))
+                (Account.type == "Cash") |
+                (Account.type == "Other"))
         )
         
         account_balances = db.session.execute(stmt).all()
