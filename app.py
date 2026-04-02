@@ -9,7 +9,7 @@ from views.expenses import expenses_bp
 from views.income import income_bp
 from views.transfers import transfers_bp
 from views.graphs import graphs_bp
-from models import Expense, Income
+from models import Account, Expense, Income, IncomeAllocation, IncomeCategory, Transfer
 import os
 import datetime as dt
 
@@ -56,9 +56,12 @@ def create_app(test_config=None):
         
         # Query all expenses from start of month to today
         monthly_income = db.session.execute(
-            db.select(Income).filter(
+            db.select(Income)
+            .join(Income.category)
+            .filter(
                 Income.date >= first_day,
-                Income.date <= current_date
+                Income.date <= current_date,
+                IncomeCategory.name != 'Reimbursement'
             )
         ).scalars().all()
 
@@ -71,12 +74,71 @@ def create_app(test_config=None):
         days_elapsed = current_date.day
         zero_spend_days = days_elapsed - len(expense_dates)
         
+        # Calculate account balances
+        expense_subq = (
+            db.select(
+                Expense.account_id,
+                db.func.sum(Expense.amount).label("total_expense")
+            )
+            .group_by(Expense.account_id)
+            .subquery()
+        )
+        income_subq = (
+            db.select(
+                IncomeAllocation.account_id,
+                db.func.sum(IncomeAllocation.amount).label("total_income")
+            )
+            .group_by(IncomeAllocation.account_id)
+            .subquery()
+        )
+        transfer_out_subq = (
+            db.select(
+                Transfer.from_account_id.label("account_id"),
+                db.func.sum(Transfer.amount).label("total_out")
+            )
+            .group_by(Transfer.from_account_id)
+            .subquery()
+        )
+        transfer_in_subq = (
+            db.select(
+                Transfer.to_account_id.label("account_id"),
+                db.func.sum(Transfer.amount).label("total_in")
+            )
+            .group_by(Transfer.to_account_id)
+            .subquery()
+        )
+        stmt = (
+            db.select(
+                Account.id.label("account_id"),
+                Account.name.label("name"),
+                (
+                    db.func.coalesce(Account.starting_balance, 0)
+                    + db.func.coalesce(income_subq.c.total_income, 0)
+                    - db.func.coalesce(expense_subq.c.total_expense, 0)
+                    + db.func.coalesce(transfer_in_subq.c.total_in, 0)
+                    - db.func.coalesce(transfer_out_subq.c.total_out, 0)
+                ).label("balance")
+            )
+            .outerjoin(income_subq, income_subq.c.account_id == Account.id)
+            .outerjoin(expense_subq, expense_subq.c.account_id == Account.id)
+            .outerjoin(transfer_in_subq, transfer_in_subq.c.account_id == Account.id)
+            .outerjoin(transfer_out_subq, transfer_out_subq.c.account_id == Account.id)
+            .filter(
+                (Account.type == "Credit Card") |
+                (Account.type == "Checking") |
+                (Account.type == "Savings") |
+                (Account.type == "Cash"))
+        )
+        
+        account_balances = db.session.execute(stmt).all()
+        
         return render_template("index.html", active_page="index",
                                current_date=current_date,
                                monthly_expenses_total=monthly_expenses_total,
                                monthly_income_total=monthly_income_total, 
                                zero_spend_days=zero_spend_days,
-                               days_elapsed=days_elapsed)
+                               days_elapsed=days_elapsed,
+                               account_balances=account_balances)
 
     with app.app_context():
         db.create_all()

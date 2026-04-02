@@ -9,6 +9,13 @@
         Total income this month: {{ "$%.2f"|format(monthly_income_total) }}<br>
         Zero-spend days this month: {{ zero_spend_days }} of {{ days_elapsed }}
     </div>
+    <div class="col alert alert-primary" role="alert">
+        <h5>Account Balances</h5>
+        <hr class="hr" />
+        {% for account in account_balances %}
+            {{ account.name }} : {{ "$%.2f"|format(account.balance) }}<br>
+        {% endfor %}
+    </div>
 </div>
 
 {% endblock %}
