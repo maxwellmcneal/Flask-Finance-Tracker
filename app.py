@@ -128,6 +128,7 @@ def create_app(test_config=None):
                 (Account.type == "Checking") |
                 (Account.type == "Savings") |
                 (Account.type == "Cash") |
+                (Account.type == "Brokerage") |
                 (Account.type == "Other"))
         )
         
